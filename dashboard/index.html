@@ -257,7 +257,15 @@
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
         }
+
+        // Browser Autoplay Policy Unlock on first click anywhere
+        document.addEventListener('click', () => {
+            initAudio();
+        });
 
         function playPing(freq, type = 'sine', duration = 0.15) {
             if (!soundEnabled) return;
@@ -267,30 +275,63 @@
                 const gain = audioCtx.createGain();
                 osc.type = type;
                 osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
                 osc.stop(audioCtx.currentTime + duration);
-            } catch (e) {}
+            } catch (e) {
+                console.error("Audio error:", e);
+            }
         }
 
         function playCriticalAlarm() {
             if (!soundEnabled) return;
             initAudio();
             try {
-                // Two-tone warble alarm
-                playPing(880, 'sawtooth', 0.2);
-                setTimeout(() => playPing(440, 'sawtooth', 0.25), 180);
-            } catch (e) {}
+                // Tactical Two-Tone Cyber Siren
+                const now = audioCtx.currentTime;
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.type = 'sawtooth';
+                osc1.frequency.setValueAtTime(950, now);
+                osc1.frequency.exponentialRampToValueAtTime(450, now + 0.3);
+                gain1.gain.setValueAtTime(0.4, now);
+                gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                osc1.start(now);
+                osc1.stop(now + 0.3);
+
+                setTimeout(() => {
+                    if (!audioCtx) return;
+                    const now2 = audioCtx.currentTime;
+                    const osc2 = audioCtx.createOscillator();
+                    const gain2 = audioCtx.createGain();
+                    osc2.type = 'sawtooth';
+                    osc2.frequency.setValueAtTime(1100, now2);
+                    osc2.frequency.exponentialRampToValueAtTime(500, now2 + 0.35);
+                    gain2.gain.setValueAtTime(0.4, now2);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, now2 + 0.35);
+                    osc2.connect(gain2);
+                    gain2.connect(audioCtx.destination);
+                    osc2.start(now2);
+                    osc2.stop(now2 + 0.35);
+                }, 200);
+            } catch (e) {
+                console.error("Critical alarm error:", e);
+            }
         }
 
         function toggleAudio() {
             soundEnabled = !soundEnabled;
+            initAudio();
             document.getElementById('soundLabel').innerText = soundEnabled ? 'ON' : 'OFF';
             document.getElementById('soundLabel').className = soundEnabled ? 'text-cyber-green' : 'text-gray-400';
-            if (soundEnabled) playPing(600);
+            if (soundEnabled) {
+                playPing(880, 'sine', 0.2);
+            }
         }
 
         // TACTICAL RADAR CANVAS
