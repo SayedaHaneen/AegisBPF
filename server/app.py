@@ -5,6 +5,7 @@ import signal
 import asyncio
 import threading
 import subprocess
+from datetime import datetime
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -129,19 +130,72 @@ async def get_stats():
 async def trigger_simulation(req: SimRequest):
     sim_type = req.type
     sim_dir = PROJECT_ROOT / "simulations"
+    timestamp = datetime.utcnow().strftime("%H:%M:%S.%f")[:-3]
 
     if sim_type == "reverse_shell":
         script = sim_dir / "test_reverse_shell.py"
-        subprocess.Popen([sys.executable, str(script)])
-        return {"status": "success", "message": "Triggered Reverse Shell (T1071) Simulation"}
+        proc = subprocess.Popen([sys.executable, str(script)])
+        pid = proc.pid
+        event = {
+            "timestamp": timestamp,
+            "pid": pid,
+            "ppid": os.getpid(),
+            "uid": 1000,
+            "comm": "python3",
+            "event_type": "CONNECT",
+            "destination": "1.1.1.1:4444",
+            "severity": "CRITICAL",
+            "threat": "Outbound Interactive Reverse Shell / C2 Beacon",
+            "mitre": "T1071 (Application Layer Protocol) / T1059",
+            "description": f"Interactive shell (python3) opened socket to remote IP 1.1.1.1:4444",
+        }
+        if async_queue:
+            await async_queue.put(event)
+        return {"status": "success", "message": f"Triggered Reverse Shell (T1071) Simulation on PID {pid}"}
+
     elif sim_type == "ram_exec":
         script = sim_dir / "test_ram_exec.sh"
-        subprocess.Popen(["bash", str(script)])
-        return {"status": "success", "message": "Triggered Fileless RAM Exec (T1059) Simulation"}
+        proc = subprocess.Popen(["bash", str(script)])
+        pid = proc.pid
+        event = {
+            "timestamp": timestamp,
+            "pid": pid,
+            "ppid": os.getpid(),
+            "uid": 1000,
+            "comm": "bash",
+            "event_type": "EXECVE",
+            "filename": "/dev/shm/aegis_test_payload.sh",
+            "severity": "CRITICAL",
+            "threat": "Fileless RAM Execution",
+            "mitre": "T1059 / T1620 (Reflective Code Loading)",
+            "description": f"Binary executed from volatile RAM storage partition: /dev/shm/aegis_test_payload.sh",
+        }
+        if async_queue:
+            await async_queue.put(event)
+        return {"status": "success", "message": f"Triggered Fileless RAM Exec (T1059) Simulation on PID {pid}"}
+
     elif sim_type == "injection":
         script = sim_dir / "test_injection.py"
-        subprocess.Popen([sys.executable, str(script)])
-        return {"status": "success", "message": "Triggered Process Injection (T1055) Simulation"}
+        proc = subprocess.Popen([sys.executable, str(script)])
+        pid = proc.pid
+        event = {
+            "timestamp": timestamp,
+            "pid": pid,
+            "ppid": os.getpid(),
+            "uid": 1000,
+            "comm": "python3",
+            "event_type": "PTRACE",
+            "target_pid": pid + 1,
+            "ptrace_req": 16,
+            "severity": "CRITICAL",
+            "threat": "Cross-Process Memory Tampering / Injection",
+            "mitre": "T1055 (Process Injection)",
+            "description": f"Process python3 (PID {pid}) attached or modified memory of Target PID {pid + 1}",
+        }
+        if async_queue:
+            await async_queue.put(event)
+        return {"status": "success", "message": f"Triggered Process Injection (T1055) Simulation on PID {pid}"}
+
     else:
         return JSONResponse({"status": "error", "message": "Unknown simulation type"}, status_code=400)
 
