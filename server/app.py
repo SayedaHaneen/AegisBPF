@@ -4,6 +4,7 @@ import json
 import signal
 import asyncio
 import threading
+import subprocess
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -117,6 +118,26 @@ async def serve_dashboard():
 @app.get("/api/stats")
 async def get_stats():
     return JSONResponse(content=telemetry_stats)
+
+@app.post("/api/simulate")
+async def trigger_simulation(data: dict):
+    sim_type = data.get("type")
+    sim_dir = PROJECT_ROOT / "simulations"
+
+    if sim_type == "reverse_shell":
+        script = sim_dir / "test_reverse_shell.py"
+        subprocess.Popen([sys.executable, str(script)])
+        return {"status": "success", "message": "Triggered Reverse Shell (T1071) Simulation"}
+    elif sim_type == "ram_exec":
+        script = sim_dir / "test_ram_exec.sh"
+        subprocess.Popen(["bash", str(script)])
+        return {"status": "success", "message": "Triggered Fileless RAM Exec (T1059) Simulation"}
+    elif sim_type == "injection":
+        script = sim_dir / "test_injection.py"
+        subprocess.Popen([sys.executable, str(script)])
+        return {"status": "success", "message": "Triggered Process Injection (T1055) Simulation"}
+    else:
+        return JSONResponse({"status": "error", "message": "Unknown simulation type"}, status_code=400)
 
 @app.post("/api/kill")
 async def kill_process(data: dict):

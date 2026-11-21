@@ -6,10 +6,10 @@
     <title>AEGIS-BPF // KERNEL THREAT RADAR</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Orbitron & Space Grotesk & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -18,8 +18,8 @@
                     colors: {
                         cyber: {
                             bg: '#05070d',
-                            panel: 'rgba(11, 16, 28, 0.75)',
-                            border: '#1a263f',
+                            panel: 'rgba(9, 14, 26, 0.82)',
+                            border: '#152138',
                             cyan: '#00f0ff',
                             red: '#ff0055',
                             green: '#00ff66',
@@ -27,7 +27,8 @@
                         }
                     },
                     fontFamily: {
-                        cyber: ['"Chakra Petch"', 'sans-serif'],
+                        orbitron: ['"Orbitron"', 'sans-serif'],
+                        grotesk: ['"Space Grotesk"', 'sans-serif'],
                         mono: ['"JetBrains Mono"', 'monospace']
                     }
                 }
@@ -38,185 +39,269 @@
         body {
             background-color: #05070d;
             background-image: 
-                radial-gradient(circle at 50% 50%, rgba(0, 240, 255, 0.03) 0%, transparent 60%),
+                radial-gradient(circle at 50% 20%, rgba(0, 240, 255, 0.05) 0%, transparent 60%),
                 linear-gradient(rgba(0, 240, 255, 0.02) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 240, 255, 0.02) 1px, transparent 1px);
-            background-size: 100% 100%, 30px 30px, 30px 30px;
+            background-size: 100% 100%, 32px 32px, 32px 32px;
         }
-        /* Scanline Overlay */
+        /* Tactical Corner Ticks */
+        .corner-frame {
+            position: relative;
+        }
+        .corner-frame::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px;
+            width: 8px; height: 8px;
+            border-top: 2px solid #00f0ff;
+            border-left: 2px solid #00f0ff;
+            pointer-events: none;
+        }
+        .corner-frame::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; right: -1px;
+            width: 8px; height: 8px;
+            border-bottom: 2px solid #00f0ff;
+            border-right: 2px solid #00f0ff;
+            pointer-events: none;
+        }
         .scanlines {
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%);
             background-size: 100% 4px;
             pointer-events: none;
         }
         .glow-cyan {
-            text-shadow: 0 0 10px rgba(0, 240, 255, 0.7), 0 0 20px rgba(0, 240, 255, 0.3);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.8), 0 0 25px rgba(0, 240, 255, 0.35);
         }
         .glow-red {
-            text-shadow: 0 0 10px rgba(255, 0, 85, 0.8), 0 0 20px rgba(255, 0, 85, 0.4);
+            text-shadow: 0 0 12px rgba(255, 0, 85, 0.9), 0 0 25px rgba(255, 0, 85, 0.45);
         }
         .glow-box-red {
-            box-shadow: 0 0 25px rgba(255, 0, 85, 0.35), inset 0 0 15px rgba(255, 0, 85, 0.2);
+            box-shadow: 0 0 30px rgba(255, 0, 85, 0.4), inset 0 0 20px rgba(255, 0, 85, 0.18);
             border-color: #ff0055 !important;
-        }
-        .glow-box-cyan {
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
         }
         @keyframes pulseAlert {
             0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.85; transform: scale(1.01); }
+            50% { opacity: 0.88; transform: scale(1.008); }
         }
         .animate-breach {
             animation: pulseAlert 1.2s infinite ease-in-out;
         }
         /* Custom scrollbar */
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #080c16; }
+        ::-webkit-scrollbar-track { background: #070a12; }
         ::-webkit-scrollbar-thumb { background: #00f0ff; border-radius: 2px; }
     </style>
 </head>
-<body class="text-gray-200 font-mono min-h-screen relative overflow-x-hidden selection:bg-cyan-500 selection:text-black">
+<body class="text-gray-200 font-grotesk min-h-screen relative overflow-x-hidden selection:bg-cyan-500 selection:text-black">
     <div class="fixed inset-0 scanlines z-50"></div>
 
     <!-- MAIN CONTAINER -->
-    <div class="relative z-10 p-4 lg:p-6 max-w-[1700px] mx-auto space-y-5">
+    <div class="relative z-10 p-3 sm:p-5 lg:p-6 max-w-[1750px] mx-auto space-y-4">
         
         <!-- HEADER HUD -->
-        <header class="flex flex-wrap items-center justify-between border-b border-cyber-border pb-4 gap-4">
+        <header class="flex flex-wrap items-center justify-between border-b border-cyber-border pb-3 gap-3">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-lg border border-cyber-cyan bg-cyber-cyan/10 flex items-center justify-center glow-box-cyan">
-                    <span class="text-cyber-cyan text-xl font-bold font-cyber">⚡</span>
+                <div class="w-11 h-11 rounded-lg border border-cyber-cyan bg-cyber-cyan/10 flex items-center justify-center shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+                    <span class="text-cyber-cyan text-2xl font-bold font-orbitron">⚡</span>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold font-cyber tracking-wider text-white flex items-center gap-2">
+                    <h1 class="text-2xl sm:text-3xl font-extrabold font-orbitron tracking-widest text-white flex items-center gap-2">
                         AEGIS<span class="text-cyber-cyan glow-cyan">BPF</span>
-                        <span class="text-xs font-mono px-2 py-0.5 rounded bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/40">v1.0-LIVE</span>
+                        <span class="text-[10px] font-mono tracking-normal px-2 py-0.5 rounded bg-cyber-cyan/15 text-cyber-cyan border border-cyber-cyan/40">PRO-EDITION</span>
                     </h1>
-                    <p class="text-xs text-gray-400">KERNEL-NATIVE RUNTIME THREAT HUNTER & MITRE RADAR</p>
+                    <p class="text-[11px] font-mono text-gray-400 tracking-wider">KERNEL-NATIVE RUNTIME THREAT HUNTER & TACTICAL SOC</p>
                 </div>
             </div>
 
             <!-- STATUS PILLS -->
-            <div class="flex flex-wrap items-center gap-3 text-xs">
-                <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyber-green/10 border border-cyber-green/30 text-cyber-green">
+            <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
+                <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-cyber-green/10 border border-cyber-green/30 text-cyber-green">
                     <span class="w-2 h-2 rounded-full bg-cyber-green animate-ping"></span>
-                    <span>KERNEL PROBES: <strong id="probeCount">ACTIVE (3)</strong></span>
+                    <span>PROBES: <strong id="probeCount">ACTIVE (3)</strong></span>
                 </div>
-                <div class="px-3 py-1.5 rounded-full bg-cyber-panel border border-cyber-border text-gray-300">
-                    HOST: <span id="hostKernel" class="text-cyber-cyan">Linux 6.18.58-WSL2</span>
+                <div class="px-3 py-1 rounded-full bg-cyber-panel border border-cyber-border text-gray-300">
+                    HOST: <span class="text-cyber-cyan">Linux 6.18.58-WSL2</span>
                 </div>
-                <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyber-panel border border-cyber-border">
+                <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-cyber-panel border border-cyber-border">
                     <span id="threatStatusBadge" class="text-cyber-green font-bold flex items-center gap-1.5">
                         <span class="w-2 h-2 rounded-full bg-cyber-green"></span> SECURE // MONITORING
                     </span>
                 </div>
-                <button id="soundToggle" onclick="toggleAudio()" class="px-3 py-1.5 rounded-lg border border-cyber-border hover:border-cyber-cyan bg-cyber-panel text-gray-300 hover:text-cyber-cyan transition text-xs flex items-center gap-1">
-                    🔊 SFX: <span id="soundLabel" class="text-cyber-green">ON</span>
+                <button id="soundToggle" onclick="toggleAudio()" class="px-3 py-1 rounded-lg border border-cyber-border hover:border-cyber-cyan bg-cyber-panel text-gray-300 hover:text-cyber-cyan transition flex items-center gap-1">
+                    🔊 SFX: <span id="soundLabel" class="text-cyber-green font-bold">ON</span>
+                </button>
+                <button onclick="exportIncidentReport()" class="px-3 py-1 rounded-lg border border-cyber-cyan/50 hover:border-cyber-cyan bg-cyber-cyan/10 hover:bg-cyber-cyan/20 text-cyber-cyan transition font-bold flex items-center gap-1">
+                    📥 EXPORT REPORT
                 </button>
             </div>
         </header>
 
+        <!-- ATTACK SIMULATION LAUNCHPAD (DIRECT 1-CLICK TESTS) -->
+        <div class="p-3 rounded-xl bg-cyber-panel backdrop-blur-md border border-cyber-border flex flex-wrap items-center justify-between gap-3 corner-frame">
+            <div class="flex items-center gap-2 text-xs font-mono">
+                <span class="text-cyber-cyan font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-cyber-cyan"></span> THREAT SIMULATION LAUNCHPAD:
+                </span>
+                <span class="text-gray-400 hidden md:inline">(Directly trigger benign test attacks inside kernel)</span>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <button onclick="runSimulation('reverse_shell')" class="px-3 py-1.5 rounded-lg bg-cyber-red/20 hover:bg-cyber-red/35 border border-cyber-red/50 text-red-200 text-xs font-mono font-bold transition flex items-center gap-1.5 shadow-[0_0_10px_rgba(255,0,85,0.2)]">
+                    ⚡ SIMULATE REVERSE SHELL (T1071)
+                </button>
+                <button onclick="runSimulation('ram_exec')" class="px-3 py-1.5 rounded-lg bg-cyber-amber/20 hover:bg-cyber-amber/35 border border-cyber-amber/50 text-amber-200 text-xs font-mono font-bold transition flex items-center gap-1.5">
+                    ⚡ SIMULATE RAM EXEC (T1059)
+                </button>
+                <button onclick="runSimulation('injection')" class="px-3 py-1.5 rounded-lg bg-purple-500/20 hover:bg-purple-500/35 border border-purple-500/50 text-purple-200 text-xs font-mono font-bold transition flex items-center gap-1.5">
+                    ⚡ SIMULATE PTRACE INJECTION (T1055)
+                </button>
+            </div>
+        </div>
+
         <!-- TELEMETRY COUNTER CARDS -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="p-4 rounded-xl bg-cyber-panel backdrop-blur-md border border-cyber-border hover:border-cyber-cyan/50 transition">
-                <span class="text-xs text-gray-400 uppercase tracking-widest">Total Intercepts</span>
-                <div class="text-2xl font-bold font-cyber text-white mt-1" id="totalEvents">0</div>
-                <span class="text-[10px] text-cyber-cyan">Ring Buffer Perf Events</span>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 font-mono">
+            <div class="p-4 rounded-xl bg-cyber-panel backdrop-blur-md border border-cyber-border hover:border-cyber-cyan/50 transition corner-frame">
+                <span class="text-[11px] text-gray-400 uppercase tracking-widest font-grotesk">Total Syscall Intercepts</span>
+                <div class="text-3xl font-extrabold font-orbitron text-white mt-1" id="totalEvents">0</div>
+                <span class="text-[10px] text-cyber-cyan">eBPF Ring Buffer Telemetry</span>
             </div>
-            <div class="p-4 rounded-xl bg-cyber-panel backdrop-blur-md border border-cyber-border hover:border-cyber-red/50 transition">
-                <span class="text-xs text-gray-400 uppercase tracking-widest">Breaches Intercepted</span>
-                <div class="text-2xl font-bold font-cyber text-cyber-red glow-red mt-1" id="threatCount">0</div>
-                <span class="text-[10px] text-cyber-red">MITRE Technique Triggers</span>
+            <div class="p-4 rounded-xl bg-cyber-panel backdrop-blur-md border border-cyber-border hover:border-cyber-red/50 transition corner-frame">
+                <span class="text-[11px] text-gray-400 uppercase tracking-widest font-grotesk">Breaches Intercepted</span>
+                <div class="text-3xl font-extrabold font-orbitron text-cyber-red glow-red mt-1" id="threatCount">0</div>
+                <span class="text-[10px] text-cyber-red">MITRE ATT&CK Triggers</span>
             </div>
-            <div class="p-4 rounded-xl bg-cyber-panel backdrop-blur-md border border-cyber-border hover:border-cyber-green/50 transition">
-                <span class="text-xs text-gray-400 uppercase tracking-widest">Probes Attached</span>
-                <div class="text-2xl font-bold font-cyber text-cyber-green mt-1">3 / 3</div>
-                <span class="text-[10px] text-cyber-green">execve, connect, ptrace</span>
+            <div class="p-4 rounded-xl bg-cyber-panel backdrop-blur-md border border-cyber-border hover:border-cyber-green/50 transition corner-frame">
+                <span class="text-[11px] text-gray-400 uppercase tracking-widest font-grotesk">Kernel In-Tree Probes</span>
+                <div class="text-3xl font-extrabold font-orbitron text-cyber-green mt-1">3 / 3</div>
+                <span class="text-[10px] text-cyber-green">Hooked: execve, connect, ptrace</span>
             </div>
-            <div class="p-4 rounded-xl bg-cyber-panel backdrop-blur-md border border-cyber-border hover:border-cyber-amber/50 transition">
-                <span class="text-xs text-gray-400 uppercase tracking-widest">Engine Latency</span>
-                <div class="text-2xl font-bold font-cyber text-cyber-amber mt-1">&lt; 0.8 µs</div>
-                <span class="text-[10px] text-cyber-amber">Zero Context-Switch Drop</span>
+            <div class="p-4 rounded-xl bg-cyber-panel backdrop-blur-md border border-cyber-border hover:border-cyber-amber/50 transition corner-frame">
+                <span class="text-[11px] text-gray-400 uppercase tracking-widest font-grotesk">Telemetry Latency</span>
+                <div class="text-3xl font-extrabold font-orbitron text-cyber-amber mt-1">&lt; 0.8 µs</div>
+                <span class="text-[10px] text-cyber-amber">Zero Context-Switch Overhead</span>
+            </div>
+        </div>
+
+        <!-- MITRE ATT&CK MATRIX LIVE HEATMAP -->
+        <div class="p-3 sm:p-4 rounded-xl bg-cyber-panel backdrop-blur-md border border-cyber-border space-y-2 corner-frame">
+            <div class="flex items-center justify-between text-xs font-mono">
+                <span class="text-gray-300 font-bold uppercase tracking-wider flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyber-cyan"></span>
+                    MITRE ATT&CK® Active Coverage Matrix
+                </span>
+                <span class="text-gray-400 text-[11px]">Dynamic Heatmap Status</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 font-mono text-xs">
+                <div id="heat-T1059" class="p-2.5 rounded-lg border border-cyber-border/70 bg-black/40 flex flex-col justify-between transition-all duration-300">
+                    <div class="flex items-center justify-between text-[11px]">
+                        <span class="font-bold text-gray-400" id="label-T1059">T1059</span>
+                        <span id="cnt-T1059" class="text-[10px] px-1 rounded bg-black text-gray-400">0</span>
+                    </div>
+                    <div class="text-[11px] font-grotesk text-gray-300 mt-1">Fileless RAM Exec</div>
+                    <span class="text-[9px] text-cyber-green mt-1">ARMED</span>
+                </div>
+                <div id="heat-T1071" class="p-2.5 rounded-lg border border-cyber-border/70 bg-black/40 flex flex-col justify-between transition-all duration-300">
+                    <div class="flex items-center justify-between text-[11px]">
+                        <span class="font-bold text-gray-400" id="label-T1071">T1071</span>
+                        <span id="cnt-T1071" class="text-[10px] px-1 rounded bg-black text-gray-400">0</span>
+                    </div>
+                    <div class="text-[11px] font-grotesk text-gray-300 mt-1">Reverse Shell C2</div>
+                    <span class="text-[9px] text-cyber-green mt-1">ARMED</span>
+                </div>
+                <div id="heat-T1055" class="p-2.5 rounded-lg border border-cyber-border/70 bg-black/40 flex flex-col justify-between transition-all duration-300">
+                    <div class="flex items-center justify-between text-[11px]">
+                        <span class="font-bold text-gray-400" id="label-T1055">T1055</span>
+                        <span id="cnt-T1055" class="text-[10px] px-1 rounded bg-black text-gray-400">0</span>
+                    </div>
+                    <div class="text-[11px] font-grotesk text-gray-300 mt-1">Process Injection</div>
+                    <span class="text-[9px] text-cyber-green mt-1">ARMED</span>
+                </div>
+                <div id="heat-T1068" class="p-2.5 rounded-lg border border-cyber-border/70 bg-black/40 flex flex-col justify-between transition-all duration-300">
+                    <div class="flex items-center justify-between text-[11px]">
+                        <span class="font-bold text-gray-400">T1068</span>
+                        <span class="text-[10px] px-1 rounded bg-black text-gray-400">0</span>
+                    </div>
+                    <div class="text-[11px] font-grotesk text-gray-300 mt-1">Privilege Shifts</div>
+                    <span class="text-[9px] text-cyber-green mt-1">ARMED</span>
+                </div>
+                <div id="heat-T1620" class="p-2.5 rounded-lg border border-cyber-border/70 bg-black/40 flex flex-col justify-between transition-all duration-300">
+                    <div class="flex items-center justify-between text-[11px]">
+                        <span class="font-bold text-gray-400">T1620</span>
+                        <span class="text-[10px] px-1 rounded bg-black text-gray-400">0</span>
+                    </div>
+                    <div class="text-[11px] font-grotesk text-gray-300 mt-1">Reflective Loading</div>
+                    <span class="text-[9px] text-cyber-green mt-1">ARMED</span>
+                </div>
             </div>
         </div>
 
         <!-- MAIN GRID: RADAR + ACTIVE ALERTS + EVENT STREAM -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
             
-            <!-- LEFT 4 COLS: TACTICAL THREAT RADAR -->
+            <!-- LEFT 4 COLS: TACTICAL THREAT RADAR & OSCILLOSCOPE -->
             <div class="lg:col-span-4 space-y-4">
-                <div class="p-4 rounded-xl bg-cyber-panel backdrop-blur-md border border-cyber-border flex flex-col items-center relative overflow-hidden">
-                    <div class="w-full flex items-center justify-between mb-2">
-                        <span class="text-xs font-cyber tracking-widest text-cyber-cyan uppercase flex items-center gap-2">
+                
+                <!-- RADAR -->
+                <div class="p-4 rounded-xl bg-cyber-panel backdrop-blur-md border border-cyber-border flex flex-col items-center relative overflow-hidden corner-frame">
+                    <div class="w-full flex items-center justify-between mb-1 font-mono">
+                        <span class="text-xs font-bold tracking-widest text-cyber-cyan uppercase flex items-center gap-2">
                             <span class="w-1.5 h-1.5 rounded-full bg-cyber-cyan animate-ping"></span>
                             Tactical Vector Radar
                         </span>
-                        <span class="text-[10px] text-gray-400">RANGE: LOCALHOST & NET</span>
+                        <span class="text-[10px] text-gray-400">SWEEP: 360°</span>
                     </div>
 
                     <!-- Canvas Radar -->
                     <div class="relative w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] my-2">
                         <canvas id="radarCanvas" width="320" height="320" class="w-full h-full"></canvas>
                         <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <div class="w-2 h-2 rounded-full bg-cyber-cyan glow-cyan"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-cyber-cyan glow-cyan"></div>
                         </div>
                     </div>
 
-                    <div class="w-full grid grid-cols-3 gap-2 text-center text-[10px] text-gray-400 mt-2 border-t border-cyber-border/60 pt-3">
-                        <div><span class="text-cyber-green">●</span> NORMAL (EXEC)</div>
+                    <div class="w-full grid grid-cols-3 gap-2 text-center text-[10px] font-mono text-gray-400 mt-1 border-t border-cyber-border/60 pt-2.5">
+                        <div><span class="text-cyber-green">●</span> NORMAL</div>
                         <div><span class="text-cyber-amber">●</span> NET CONN</div>
-                        <div><span class="text-cyber-red">●</span> THREAT HIT</div>
+                        <div><span class="text-cyber-red">●</span> BREACH</div>
                     </div>
                 </div>
 
-                <!-- MITRE ATT&CK TECHNIQUES COVERED -->
-                <div class="p-4 rounded-xl bg-cyber-panel backdrop-blur-md border border-cyber-border space-y-3">
-                    <div class="text-xs font-cyber tracking-widest text-gray-300 uppercase">Active Defense Matrices</div>
-                    <div class="space-y-2 text-xs">
-                        <div class="p-2 rounded bg-black/40 border border-cyber-border flex items-center justify-between">
-                            <div>
-                                <span class="text-cyber-red font-bold">T1059 / T1620</span>
-                                <div class="text-[11px] text-gray-400">Fileless RAM Exec (/dev/shm)</div>
-                            </div>
-                            <span class="text-[10px] text-cyber-green px-1.5 py-0.5 rounded bg-cyber-green/10 border border-cyber-green/30">ARMED</span>
-                        </div>
-                        <div class="p-2 rounded bg-black/40 border border-cyber-border flex items-center justify-between">
-                            <div>
-                                <span class="text-cyber-red font-bold">T1071 / T1059.004</span>
-                                <div class="text-[11px] text-gray-400">Reverse Shell C2 Beaconing</div>
-                            </div>
-                            <span class="text-[10px] text-cyber-green px-1.5 py-0.5 rounded bg-cyber-green/10 border border-cyber-green/30">ARMED</span>
-                        </div>
-                        <div class="p-2 rounded bg-black/40 border border-cyber-border flex items-center justify-between">
-                            <div>
-                                <span class="text-cyber-red font-bold">T1055</span>
-                                <div class="text-[11px] text-gray-400">Cross-Process Memory Injection</div>
-                            </div>
-                            <span class="text-[10px] text-cyber-green px-1.5 py-0.5 rounded bg-cyber-green/10 border border-cyber-green/30">ARMED</span>
-                        </div>
+                <!-- KERNEL SYSCALL OSCILLOSCOPE (FREQUENCY WAVE) -->
+                <div class="p-3 rounded-xl bg-cyber-panel backdrop-blur-md border border-cyber-border space-y-2 corner-frame font-mono">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-gray-300 font-bold uppercase tracking-wider flex items-center gap-2">
+                            <span class="w-1.5 h-1.5 rounded-full bg-cyber-amber"></span>
+                            Syscall Pulse Waveform
+                        </span>
+                        <span class="text-[10px] text-cyber-amber" id="rateLabel">0 eps</span>
+                    </div>
+                    <div class="h-20 w-full relative">
+                        <canvas id="waveCanvas" width="400" height="80" class="w-full h-full rounded bg-black/40 border border-cyber-border/50"></canvas>
                     </div>
                 </div>
+
             </div>
 
             <!-- RIGHT 8 COLS: ACTIVE THREATS & LIVE STREAM -->
             <div class="lg:col-span-8 space-y-4">
                 
                 <!-- CRITICAL THREAT BANNER (DYNAMIC) -->
-                <div id="criticalThreatBox" class="hidden p-4 rounded-xl bg-cyber-red/10 border border-cyber-red glow-box-red animate-breach transition-all">
+                <div id="criticalThreatBox" class="hidden p-4 rounded-xl bg-cyber-red/10 border border-cyber-red glow-box-red animate-breach transition-all corner-frame">
                     <div class="flex flex-wrap items-center justify-between gap-3">
                         <div class="flex items-center gap-3">
-                            <span class="text-3xl text-cyber-red">🚨</span>
+                            <span class="text-4xl text-cyber-red">🚨</span>
                             <div>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-xs font-bold px-2 py-0.5 rounded bg-cyber-red text-black uppercase font-cyber">CRITICAL BREACH DETECTED</span>
+                                    <span class="text-xs font-bold px-2 py-0.5 rounded bg-cyber-red text-black uppercase font-orbitron">CRITICAL BREACH DETECTED</span>
                                     <span id="activeThreatMitre" class="text-xs font-mono text-cyber-red font-bold">T1059</span>
                                 </div>
-                                <h3 id="activeThreatTitle" class="text-lg font-bold text-white mt-0.5">Fileless Binary Execution Detected</h3>
-                                <p id="activeThreatDesc" class="text-xs text-gray-300 font-mono mt-1">PID 3421 executed from /dev/shm/payload</p>
+                                <h3 id="activeThreatTitle" class="text-lg font-bold font-orbitron text-white mt-1">Fileless Binary Execution Detected</h3>
+                                <p id="activeThreatDesc" class="text-xs text-gray-300 font-mono mt-0.5">PID 3421 executed from /dev/shm/payload</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button id="killBtn" onclick="neutralizeTarget()" class="px-4 py-2 rounded-lg bg-cyber-red hover:bg-red-600 text-white font-bold font-cyber text-xs tracking-wider transition shadow-lg shadow-red-500/50 flex items-center gap-2">
+                            <button id="killBtn" onclick="neutralizeTarget()" class="px-5 py-2.5 rounded-lg bg-cyber-red hover:bg-red-600 text-white font-bold font-orbitron text-xs tracking-wider transition shadow-[0_0_20px_rgba(255,0,85,0.6)] flex items-center gap-2">
                                 <span>⚡ NEUTRALIZE PID <span id="targetPidText"></span></span>
                             </button>
                         </div>
@@ -224,22 +309,22 @@
                 </div>
 
                 <!-- LIVE KERNEL WATERFALL STREAM -->
-                <div class="p-4 rounded-xl bg-cyber-panel backdrop-blur-md border border-cyber-border flex flex-col h-[560px]">
-                    <div class="flex items-center justify-between pb-3 border-b border-cyber-border mb-3">
+                <div class="p-4 rounded-xl bg-cyber-panel backdrop-blur-md border border-cyber-border flex flex-col h-[580px] corner-frame">
+                    <div class="flex items-center justify-between pb-3 border-b border-cyber-border mb-3 font-mono">
                         <div class="flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-cyber-cyan animate-pulse"></span>
-                            <span class="text-xs font-cyber tracking-widest text-white uppercase">Real-Time Kernel Telemetry Stream</span>
+                            <span class="text-xs font-bold tracking-widest text-white uppercase font-orbitron">Real-Time Kernel Telemetry Stream</span>
                         </div>
                         <div class="flex items-center gap-2 text-xs">
                             <span class="text-gray-400">FILTER:</span>
-                            <button onclick="setFilter('ALL')" id="filterALL" class="px-2 py-0.5 rounded bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/40">ALL</button>
-                            <button onclick="setFilter('CRITICAL')" id="filterCRIT" class="px-2 py-0.5 rounded bg-transparent text-gray-400 border border-cyber-border hover:border-cyber-red">BREACHES</button>
+                            <button onclick="setFilter('ALL')" id="filterALL" class="px-2.5 py-0.5 rounded bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/40 font-bold">ALL</button>
+                            <button onclick="setFilter('CRITICAL')" id="filterCRIT" class="px-2.5 py-0.5 rounded bg-transparent text-gray-400 border border-cyber-border hover:border-cyber-red font-bold">BREACHES</button>
                         </div>
                     </div>
 
                     <!-- Scrollable Log Container -->
                     <div id="eventStream" class="flex-1 overflow-y-auto space-y-2 pr-1 font-mono text-xs">
-                        <div class="text-gray-500 italic p-3 text-center">Awaiting incoming kernel telemetry from eBPF ring buffer...</div>
+                        <div class="text-gray-500 italic p-4 text-center">Awaiting incoming kernel telemetry from eBPF ring buffer...</div>
                     </div>
                 </div>
             </div>
@@ -249,7 +334,7 @@
 
     <!-- AUDIO SYNTHESIS & SCRIPT LOGIC -->
     <script>
-        // WEB AUDIO SYNTHESIZER (No external sound files required)
+        // WEB AUDIO SYNTHESIZER
         let audioCtx = null;
         let soundEnabled = true;
 
@@ -262,7 +347,7 @@
             }
         }
 
-        // Browser Autoplay Policy Unlock on first click anywhere
+        // Unlock audio on any click
         document.addEventListener('click', () => {
             initAudio();
         });
@@ -281,16 +366,13 @@
                 gain.connect(audioCtx.destination);
                 osc.start();
                 osc.stop(audioCtx.currentTime + duration);
-            } catch (e) {
-                console.error("Audio error:", e);
-            }
+            } catch (e) {}
         }
 
         function playCriticalAlarm() {
             if (!soundEnabled) return;
             initAudio();
             try {
-                // Tactical Two-Tone Cyber Siren
                 const now = audioCtx.currentTime;
                 const osc1 = audioCtx.createOscillator();
                 const gain1 = audioCtx.createGain();
@@ -319,22 +401,18 @@
                     osc2.start(now2);
                     osc2.stop(now2 + 0.35);
                 }, 200);
-            } catch (e) {
-                console.error("Critical alarm error:", e);
-            }
+            } catch (e) {}
         }
 
         function toggleAudio() {
             soundEnabled = !soundEnabled;
             initAudio();
             document.getElementById('soundLabel').innerText = soundEnabled ? 'ON' : 'OFF';
-            document.getElementById('soundLabel').className = soundEnabled ? 'text-cyber-green' : 'text-gray-400';
-            if (soundEnabled) {
-                playPing(880, 'sine', 0.2);
-            }
+            document.getElementById('soundLabel').className = soundEnabled ? 'text-cyber-green font-bold' : 'text-gray-400 font-bold';
+            if (soundEnabled) playPing(880, 'sine', 0.2);
         }
 
-        // TACTICAL RADAR CANVAS
+        // RADAR CANVAS
         const canvas = document.getElementById('radarCanvas');
         const ctx = canvas.getContext('2d');
         let angle = 0;
@@ -348,7 +426,7 @@
                 y: 160 + dist * Math.sin(blipAngle),
                 color: color,
                 opacity: 1.0,
-                radius: color === '#ff0055' ? 6 : 3
+                radius: color === '#ff0055' ? 7 : 3.5
             });
         }
 
@@ -356,7 +434,7 @@
             ctx.clearRect(0, 0, 320, 320);
 
             // Radar rings
-            ctx.strokeStyle = 'rgba(0, 240, 255, 0.15)';
+            ctx.strokeStyle = 'rgba(0, 240, 255, 0.16)';
             ctx.lineWidth = 1;
             [40, 80, 120, 150].forEach(r => {
                 ctx.beginPath();
@@ -370,12 +448,12 @@
             ctx.moveTo(10, 160); ctx.lineTo(310, 160);
             ctx.stroke();
 
-            // Radar sweep beam
+            // Radar sweep
             ctx.save();
             ctx.translate(160, 160);
             ctx.rotate(angle);
             const gradient = ctx.createLinearGradient(0, 0, 150, 0);
-            gradient.addColorStop(0, 'rgba(0, 240, 255, 0.4)');
+            gradient.addColorStop(0, 'rgba(0, 240, 255, 0.45)');
             gradient.addColorStop(1, 'rgba(0, 240, 255, 0.0)');
             ctx.fillStyle = gradient;
             ctx.beginPath();
@@ -396,7 +474,7 @@
                 ctx.globalAlpha = b.opacity;
                 ctx.fill();
                 ctx.globalAlpha = 1.0;
-                b.opacity -= 0.008;
+                b.opacity -= 0.007;
                 if (b.opacity <= 0) radarBlips.splice(i, 1);
             }
 
@@ -404,44 +482,73 @@
         }
         drawRadar();
 
-        // WEBSOCKET TELEMETRY CLIENT
+        // KERNEL WAVEFORM OSCILLOSCOPE CANVAS
+        const waveCanvas = document.getElementById('waveCanvas');
+        const waveCtx = waveCanvas.getContext('2d');
+        const waveData = new Array(50).fill(10);
+        let eventsInLastSec = 0;
+
+        setInterval(() => {
+            document.getElementById('rateLabel').innerText = `${eventsInLastSec} eps`;
+            waveData.push(Math.min(70, 10 + eventsInLastSec * 8));
+            waveData.shift();
+            eventsInLastSec = 0;
+            drawWave();
+        }, 300);
+
+        function drawWave() {
+            waveCtx.clearRect(0, 0, 400, 80);
+            waveCtx.strokeStyle = '#ffaa00';
+            waveCtx.lineWidth = 2;
+            waveCtx.beginPath();
+            const step = 400 / (waveData.length - 1);
+            waveData.forEach((val, i) => {
+                const x = i * step;
+                const y = 80 - val;
+                if (i === 0) waveCtx.moveTo(x, y);
+                else waveCtx.lineTo(x, y);
+            });
+            waveCtx.stroke();
+        }
+
+        // WEBSOCKET TELEMETRY CLIENT & STATE
         let currentFilter = 'ALL';
         let currentThreatPid = null;
         let eventCount = 0;
         let breachCount = 0;
+        const mitreCounts = { T1059: 0, T1071: 0, T1055: 0 };
+        const eventsCache = [];
 
         function setFilter(filter) {
             currentFilter = filter;
             document.getElementById('filterALL').className = filter === 'ALL' 
-                ? 'px-2 py-0.5 rounded bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/40' 
-                : 'px-2 py-0.5 rounded bg-transparent text-gray-400 border border-cyber-border';
+                ? 'px-2.5 py-0.5 rounded bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/40 font-bold' 
+                : 'px-2.5 py-0.5 rounded bg-transparent text-gray-400 border border-cyber-border font-bold';
             document.getElementById('filterCRIT').className = filter === 'CRITICAL' 
-                ? 'px-2 py-0.5 rounded bg-cyber-red/20 text-cyber-red border border-cyber-red/40' 
-                : 'px-2 py-0.5 rounded bg-transparent text-gray-400 border border-cyber-border';
+                ? 'px-2.5 py-0.5 rounded bg-cyber-red/20 text-cyber-red border border-cyber-red/40 font-bold' 
+                : 'px-2.5 py-0.5 rounded bg-transparent text-gray-400 border border-cyber-border font-bold';
             renderStream();
         }
-
-        const eventsCache = [];
 
         function renderStream() {
             const stream = document.getElementById('eventStream');
             stream.innerHTML = '';
             const filtered = eventsCache.filter(e => currentFilter === 'ALL' || e.severity === 'CRITICAL');
             if (filtered.length === 0) {
-                stream.innerHTML = '<div class="text-gray-500 italic p-3 text-center">No matching events in filter buffer.</div>';
+                stream.innerHTML = '<div class="text-gray-500 italic p-4 text-center">No matching events in filter buffer.</div>';
                 return;
             }
-            filtered.slice(-80).reverse().forEach(e => {
+            filtered.slice(-100).reverse().forEach(e => {
                 const isCrit = e.severity === 'CRITICAL';
                 const el = document.createElement('div');
                 el.className = `p-2.5 rounded border transition-all ${
-                    isCrit ? 'bg-cyber-red/15 border-cyber-red/60 text-red-200' : 'bg-black/40 border-cyber-border/70 text-gray-300'
+                    isCrit ? 'bg-cyber-red/15 border-cyber-red/70 text-red-200' : 'bg-black/40 border-cyber-border/70 text-gray-300'
                 }`;
                 el.innerHTML = `
-                    <div class="flex items-center justify-between text-[11px] mb-1">
-                        <span class="font-bold ${isCrit ? 'text-cyber-red' : 'text-cyber-cyan'}">[${e.timestamp}] ${e.event_type}</span>
+                    <div class="flex items-center justify-between text-[11px] mb-1 font-mono">
+                        <span class="font-bold ${isCrit ? 'text-cyber-red font-orbitron' : 'text-cyber-cyan'}">[${e.timestamp}] ${e.event_type}</span>
                         <div class="flex items-center gap-2">
-                            ${e.mitre ? `<span class="px-1.5 py-0.2 rounded bg-cyber-red text-black font-bold text-[9px]">${e.mitre}</span>` : ''}
+                            ${e.mitre ? `<span class="px-1.5 py-0.2 rounded bg-cyber-red text-black font-bold text-[9px] font-mono">${e.mitre}</span>` : ''}
                             <span class="text-gray-400">PID: <strong class="text-white">${e.pid}</strong></span>
                             <span class="text-gray-400">COMM: <strong class="text-white">${e.comm}</strong></span>
                         </div>
@@ -465,6 +572,7 @@
             ws.onmessage = (msg) => {
                 const event = JSON.parse(msg.data);
                 eventCount++;
+                eventsInLastSec++;
                 document.getElementById('totalEvents').innerText = eventCount;
                 eventsCache.push(event);
 
@@ -474,6 +582,7 @@
                     addRadarBlip('#ff0055');
                     playCriticalAlarm();
                     showBreachAlert(event);
+                    updateMitreHeatmap(event);
                 } else if (event.event_type === 'CONNECT') {
                     addRadarBlip('#ffaa00');
                     playPing(750, 'sine', 0.08);
@@ -485,9 +594,28 @@
             };
 
             ws.onclose = () => {
-                console.warn("[-] WebSocket closed. Retrying in 2s...");
                 setTimeout(connectWS, 2000);
             };
+        }
+
+        function updateMitreHeatmap(e) {
+            let key = null;
+            if (e.mitre && e.mitre.includes('T1059')) key = 'T1059';
+            else if (e.mitre && e.mitre.includes('T1071')) key = 'T1071';
+            else if (e.mitre && e.mitre.includes('T1055')) key = 'T1055';
+
+            if (key) {
+                mitreCounts[key]++;
+                const box = document.getElementById(`heat-${key}`);
+                const cnt = document.getElementById(`cnt-${key}`);
+                const lbl = document.getElementById(`label-${key}`);
+                if (box && cnt && lbl) {
+                    cnt.innerText = mitreCounts[key];
+                    cnt.className = 'text-[10px] px-1 rounded bg-cyber-red text-white font-bold';
+                    lbl.className = 'font-bold text-cyber-red font-orbitron';
+                    box.className = 'p-2.5 rounded-lg border border-cyber-red/80 bg-cyber-red/20 flex flex-col justify-between transition-all duration-300 shadow-[0_0_15px_rgba(255,0,85,0.4)]';
+                }
+            }
         }
 
         function showBreachAlert(e) {
@@ -517,6 +645,49 @@
             const badge = document.getElementById('threatStatusBadge');
             badge.className = 'text-cyber-green font-bold flex items-center gap-1.5';
             badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-cyber-green"></span> SECURE // MONITORING';
+        }
+
+        async function runSimulation(type) {
+            initAudio();
+            playPing(600, 'triangle', 0.1);
+            try {
+                const res = await fetch('/api/simulate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: type })
+                });
+                const data = await res.json();
+                console.log("[*] Simulation trigger response:", data);
+            } catch (err) {
+                console.error("Simulation error:", err);
+            }
+        }
+
+        function exportIncidentReport() {
+            const report = {
+                generator: "AegisBPF Enterprise Threat Hunter v1.0",
+                export_time_utc: new Date().toISOString(),
+                host_telemetry: {
+                    kernel: "Linux 6.18.58.1-microsoft-standard-WSL2",
+                    architecture: "x86_64",
+                    probes_active: ["sys_enter_execve", "sys_enter_connect", "sys_enter_ptrace"]
+                },
+                summary_metrics: {
+                    total_syscalls_intercepted: eventCount,
+                    total_breaches: breachCount,
+                    mitre_heat_distribution: mitreCounts
+                },
+                captured_incidents: eventsCache.filter(e => e.severity === 'CRITICAL')
+            };
+
+            const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `AegisBPF_Forensic_Report_${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            playPing(1000, 'sine', 0.2);
         }
 
         window.onload = connectWS;
