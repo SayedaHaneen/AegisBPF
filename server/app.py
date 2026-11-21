@@ -10,11 +10,18 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Body
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from bcc import BPF
 from agent.threat_engine import ThreatEngine
+
+class SimRequest(BaseModel):
+    type: str
+
+class KillRequest(BaseModel):
+    pid: int
 
 app = FastAPI(title="AegisBPF Tactical SOC Server")
 
@@ -46,23 +53,22 @@ DASHBOARD_FILE = PROJECT_ROOT / "dashboard" / "index.html"
 # BPF Event Callback (Runs in worker thread)
 def perf_event_callback(cpu, data, size):
     global telemetry_stats
-    event = b["events"].event(data)
-    enriched = threat_engine.evaluate(event)
+    try:
+        event = b["events"].event(data)
+        enriched = threat_engine.evaluate(event)
 
-    telemetry_stats["total_events"] += 1
-    if enriched.get("severity") == "CRITICAL":
-        telemetry_stats["critical_threats"] += 1
+        telemetry_stats["total_events"] += 1
+        if enriched.get("severity") == "CRITICAL":
+            telemetry_stats["critical_threats"] += 1
+            print(f"\033[91m[CRITICAL THREAT] {enriched['threat']} | PID: {enriched['pid']} | {enriched['comm']}\033[0m")
+        elif enriched.get("severity") == "LOW":
+            print(f"\033[93m[NOTICE] {enriched['event_type']} | {enriched.get('description')}\033[0m")
 
-    # Print clean colorized terminal alert
-    sev = enriched["severity"]
-    if sev == "CRITICAL":
-        print(f"\033[91m[CRITICAL THREAT] {enriched['threat']} | PID: {enriched['pid']} | {enriched['comm']}\033[0m")
-    elif sev == "LOW":
-        print(f"\033[93m[NOTICE] {enriched['event_type']} | {enriched.get('description')}\033[0m")
-
-    # Pass to AsyncIO queue for WebSocket distribution
-    if async_queue and event_loop:
-        asyncio.run_coroutine_threadsafe(async_queue.put(enriched), event_loop)
+        # Pass to AsyncIO queue for WebSocket distribution safely from OS thread
+        if async_queue and event_loop and not event_loop.is_closed():
+            event_loop.call_soon_threadsafe(async_queue.put_nowait, enriched)
+    except Exception as ex:
+        print(f"Error in perf callback: {ex}")
 
 # Background BPF Polling Loop
 def bpf_polling_loop():
@@ -120,8 +126,8 @@ async def get_stats():
     return JSONResponse(content=telemetry_stats)
 
 @app.post("/api/simulate")
-async def trigger_simulation(data: dict):
-    sim_type = data.get("type")
+async def trigger_simulation(req: SimRequest):
+    sim_type = req.type
     sim_dir = PROJECT_ROOT / "simulations"
 
     if sim_type == "reverse_shell":
@@ -140,10 +146,8 @@ async def trigger_simulation(data: dict):
         return JSONResponse({"status": "error", "message": "Unknown simulation type"}, status_code=400)
 
 @app.post("/api/kill")
-async def kill_process(data: dict):
-    pid = data.get("pid")
-    if not pid:
-        return JSONResponse({"status": "error", "message": "Missing PID"}, status_code=400)
+async def kill_process(req: KillRequest):
+    pid = req.pid
     try:
         os.kill(int(pid), signal.SIGKILL)
         print(f"\033[92m[CONTAINMENT] Process {pid} terminated via SIGKILL.\033[0m")

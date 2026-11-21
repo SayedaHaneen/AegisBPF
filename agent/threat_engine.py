@@ -54,7 +54,7 @@ class ThreatEngine:
             event_dict["event_type"] = "CONNECT"
 
             # Check for Reverse Shell or C2 Beaconing
-            is_shell = event_dict["comm"] in SHELL_NAMES
+            is_shell = any(event_dict["comm"].startswith(s) for s in ("sh", "bash", "dash", "zsh", "python", "perl", "ruby", "nc", "ncat"))
             is_non_loopback = not ip_str.startswith("127.") and ip_str != "0.0.0.0"
 
             if is_shell and is_non_loopback:
